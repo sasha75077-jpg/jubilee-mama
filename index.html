@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Юбилей - 50 лет!</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="hero">
+            <div class="hero-content">
+                <h1 class="main-title">🎉 Приглашаем на юбилей! 🎉</h1>
+                <div class="age-number">50</div>
+                <p class="subtitle">Празднуем золотой юбилей!</p>
+            </div>
+        </header>
+
+        <section class="photo-section">
+            <img src="Мама.jpg" alt="Именинница" class="jubilee-photo">
+        </section>
+
+        <section class="invitation">
+            <div class="content-box">
+                <h2>Дорогие друзья и близкие!</h2>
+                <p class="invite-text">
+                    Приглашаем вас разделить с нами радость и отметить
+                    <strong>50-летие</strong> нашей любимой именинницы!
+                </p>
+                <p class="invite-text">
+                    Будем рады видеть вас на праздничном вечере,
+                    полном тепла, улыбок и приятных воспоминаний.
+                </p>
+            </div>
+        </section>
+
+        <section class="details">
+            <div class="content-box">
+                <h2>📍 Место проведения</h2>
+                <div class="detail-item">
+                    <div class="icon">🏛️</div>
+                    <div>
+                        <h3>Ресторан "Амур"</h3>
+                        <p>г. Комсомольск-на-Амуре<br>ул. Пионерская, д. 30</p>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="icon">📅</div>
+                    <div>
+                        <h3>Дата и время</h3>
+                        <p id="event-date">12 декабря 2026 года в 18:00</p>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="icon">👗</div>
+                    <div>
+                        <h3>Дресс-код</h3>
+                        <p>Нарядная одежда, праздничное настроение!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="rsvp">
+            <div class="content-box">
+                <h2>Подтвердите участие</h2>
+                <p class="rsvp-text">Пожалуйста, сообщите нам о своём решении</p>
+
+                <form id="rsvpForm" class="rsvp-form">
+                    <div class="form-group">
+                        <label for="name">Ваше имя *</label>
+                        <input type="text" id="name" name="name" required placeholder="Иван Иванов">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Телефон</label>
+                        <input type="tel" id="phone" name="phone" placeholder="+7 (999) 123-45-67">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guests">Количество гостей *</label>
+                        <select id="guests" name="guests" required>
+                            <option value="">Выберите...</option>
+                            <option value="1">1 человек</option>
+                            <option value="2">2 человека</option>
+                            <option value="3">3 человека</option>
+                            <option value="4">4 человека</option>
+                            <option value="5">5+ человек</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Вы придёте? *</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="attendance" value="yes" required>
+                                <span>✅ Да, обязательно приду!</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="attendance" value="maybe" required>
+                                <span>🤔 Пока не уверен(а)</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="attendance" value="no" required>
+                                <span>😔 К сожалению, не смогу</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Пожелания имениннице</label>
+                        <textarea id="message" name="message" rows="4" placeholder="Ваши тёплые слова и пожелания..."></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Отправить ответ</button>
+                </form>
+
+                <div id="successMessage" class="success-message" style="display: none;">
+                    <h3>✨ Спасибо за ответ!</h3>
+                    <p>Ваша информация получена. До встречи на празднике!</p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-content">
+                <p class="footer-text">С любовью и нетерпением ждём встречи с вами! 💝</p>
+                <p class="footer-note">По всем вопросам обращайтесь к организаторам</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
