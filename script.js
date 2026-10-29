@@ -1,17 +1,48 @@
+// === Приёмник ответов: ваша Google-форма ===
+const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScRgHN66GUX0arAg44J38YPu-zRh1FvLNFb2bRAFccskD24HQ/formResponse';
+
+// Текст вариантов поля "Вы придёте?" (должен совпадать с формой)
+const ATTENDANCE_LABELS = {
+    yes: '✅ Да, обязательно приду!',
+    maybe: '🤔 Пока не уверен(а)',
+    no: '😔 К сожалению, не смогу'
+};
+
 // Handle form submission
 document.getElementById('rsvpForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
+    const attendance = document.querySelector('input[name="attendance"]:checked').value;
+    const guestsSelect = document.getElementById('guests');
+    const guestsLabel = guestsSelect.options[guestsSelect.selectedIndex].text;
+
     const formData = {
-        name: document.getElementById('name').value,
-        phone: document.getElementById('phone').value,
-        guests: document.getElementById('guests').value,
-        attendance: document.querySelector('input[name="attendance"]:checked').value,
-        message: document.getElementById('message').value,
+        name: document.getElementById('name').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        guests: guestsLabel,
+        attendance: ATTENDANCE_LABELS[attendance] || attendance,
+        message: document.getElementById('message').value.trim(),
         timestamp: new Date().toLocaleString('ru-RU')
     };
 
-    // Save to localStorage for now (you can replace with actual backend later)
+    // Отправка в Google-форму (скрытый iframe — гость ничего лишнего не видит)
+    try {
+        const params = new URLSearchParams();
+        params.append('entry.571643149', formData.name);        // Ваше имя
+        params.append('entry.2019439900', formData.phone);      // Телефон
+        params.append('entry.1807244277', formData.guests);     // Количество гостей
+        params.append('entry.250966081', formData.attendance);  // Вы придёте?
+        params.append('entry.471263011', formData.message);     // Пожелания
+
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = GOOGLE_FORM_URL + '?' + params.toString();
+        document.body.appendChild(iframe);
+    } catch (err) {
+        console.error('Не удалось отправить ответ:', err);
+    }
+
+    // Локальная копия на устройстве гостя (бэкап)
     let responses = JSON.parse(localStorage.getItem('rsvpResponses') || '[]');
     responses.push(formData);
     localStorage.setItem('rsvpResponses', JSON.stringify(responses));
@@ -22,8 +53,6 @@ document.getElementById('rsvpForm').addEventListener('submit', function(e) {
 
     // Scroll to success message
     document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
-
-    console.log('RSVP submitted:', formData);
 });
 
 // Add sparkle effect on page load
