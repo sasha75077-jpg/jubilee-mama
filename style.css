@@ -530,6 +530,56 @@ img {
     outline-offset: 2px;
 }
 
+/* Чекбоксы напитков */
+
+.checkbox-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.check-label {
+    position: relative;
+    cursor: pointer;
+}
+
+.check-label input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+}
+
+.check-label span {
+    display: block;
+    text-align: center;
+    padding: 13px 8px;
+    font-size: 17px;
+    color: var(--ink);
+    background: var(--cream);
+    border: 1px solid var(--line);
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.check-label:hover span {
+    border-color: var(--sand);
+}
+
+.check-label input:checked + span {
+    background: var(--coffee);
+    border-color: var(--coffee);
+    color: var(--cream);
+}
+
+.check-label input:focus-visible + span {
+    outline: 2px solid var(--sand);
+    outline-offset: 2px;
+}
+
+.other-input {
+    margin-top: 12px;
+}
+
 /* Кнопка отправки */
 
 .submit-btn {

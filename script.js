@@ -8,6 +8,9 @@ const ATTENDANCE_LABELS = {
     no: '😔 К сожалению, не смогу'
 };
 
+// ID поля «Напитки» в Google-форме
+const ENTRY_DRINKS = 'entry.1786126185';
+
 // Handle form submission
 document.getElementById('rsvpForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -16,11 +19,19 @@ document.getElementById('rsvpForm').addEventListener('submit', function(e) {
     const guestsSelect = document.getElementById('guests');
     const guestsLabel = guestsSelect.options[guestsSelect.selectedIndex].text;
 
+    // Выбор напитков (можно несколько) + свой вариант
+    const checkedDrinks = Array.from(document.querySelectorAll('input[name="drinks"]:checked')).map(el => el.value);
+    const drinkOther = document.getElementById('drinkOther').value.trim();
+    const drinkList = checkedDrinks.filter(v => !(v === 'Свой вариант' && drinkOther));
+    if (drinkOther) drinkList.push('свой вариант: ' + drinkOther);
+    const drinksText = drinkList.join(', ');
+
     const formData = {
         name: document.getElementById('name').value.trim(),
         phone: document.getElementById('phone').value.trim(),
         guests: guestsLabel,
         attendance: ATTENDANCE_LABELS[attendance] || attendance,
+        drinks: drinksText,
         message: document.getElementById('message').value.trim(),
         timestamp: new Date().toLocaleString('ru-RU')
     };
@@ -32,6 +43,7 @@ document.getElementById('rsvpForm').addEventListener('submit', function(e) {
         params.append('entry.2019439900', formData.phone);      // Телефон
         params.append('entry.1807244277', formData.guests);     // Количество гостей
         params.append('entry.250966081', formData.attendance);  // Вы придёте?
+        params.append(ENTRY_DRINKS, formData.drinks);           // Напитки
         params.append('entry.471263011', formData.message);     // Пожелания
 
         const iframe = document.createElement('iframe');
