@@ -20,30 +20,31 @@ const ENTRY_DRINKS = 'entry.1786126185';
 
 // --- Отправка в Apps Script (основной путь) ---
 function sendToAnswers(data) {
-    const body = new URLSearchParams();
-    body.append('name', data.name);
-    body.append('phone', data.phone);
-    body.append('guests', data.guests);
-    body.append('attendance', data.attendance);
-    body.append('drinks', data.drinks);
-    body.append('message', data.message);
-
-    fetch(ANSWERS_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: body.toString()
-    }).catch(function(err) {
-        // Скрипт недоступен — не теряем ответ, шлём в форму
-        console.error('Apps Script недоступен, отправляю в Google-форму:', err);
-        sendToGoogleForm(data);
-    });
+    postHidden(ANSWERS_URL, 'answers_sink', [
+        ['name', data.name],
+        ['phone', data.phone],
+        ['guests', data.guests],
+        ['attendance', data.attendance],
+        ['drinks', data.drinks],
+        ['message', data.message]
+    ]);
 }
 
 // --- Отправка в Google-форму (резервный путь) ---
 function sendToGoogleForm(formData) {
-    try {
-        const frameName = 'gform_sink';
+    postHidden(GOOGLE_FORM_URL, 'gform_sink', [
+        ['entry.571643149', formData.name],        // Ваше имя
+        ['entry.2019439900', formData.phone],      // Телефон
+        ['entry.1807244277', formData.guests],     // Количество гостей
+        ['entry.250966081', formData.attendance],  // Вы придёте?
+        [ENTRY_DRINKS, formData.drinks],           // Напитки
+        ['entry.471263011', formData.message]      // Пожелания
+    ]);
+}
 
+// Универсальная отправка: скрытая форма + скрытый iframe (POST, без ограничения длины и без CORS)
+function postHidden(url, frameName, fields) {
+    try {
         let iframe = document.querySelector('iframe[name="' + frameName + '"]');
         if (!iframe) {
             iframe = document.createElement('iframe');
@@ -53,29 +54,22 @@ function sendToGoogleForm(formData) {
         }
 
         const form = document.createElement('form');
-        form.action = GOOGLE_FORM_URL;
+        form.action = url;
         form.method = 'POST';
         form.target = frameName;
         form.style.display = 'none';
 
-        const add = (name, value) => {
+        fields.forEach(function(pair) {
             const input = document.createElement('input');
             input.type = 'hidden';
-            input.name = name;
-            input.value = value;
+            input.name = pair[0];
+            input.value = pair[1];
             form.appendChild(input);
-        };
-
-        add('entry.571643149', formData.name);        // Ваше имя
-        add('entry.2019439900', formData.phone);      // Телефон
-        add('entry.1807244277', formData.guests);     // Количество гостей
-        add('entry.250966081', formData.attendance);  // Вы придёте?
-        add(ENTRY_DRINKS, formData.drinks);           // Напитки
-        add('entry.471263011', formData.message);     // Пожелания
+        });
 
         document.body.appendChild(form);
         form.submit();
-        setTimeout(() => form.remove(), 5000);
+        setTimeout(function() { form.remove(); }, 5000);
     } catch (err) {
         console.error('Не удалось отправить ответ:', err);
     }
