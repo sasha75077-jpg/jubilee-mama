@@ -1,7 +1,7 @@
 // === Приёмник ответов: Google Apps Script → Google-таблица ===
 // Ссылка вида https://script.google.com/macros/s/AKfy.../exec
 // Пока пусто — работает старая отправка в Google-форму (строки ниже).
-const ANSWERS_URL = '';
+const ANSWERS_URL = 'https://script.google.com/macros/s/AKfycbxzuVrt1fxZV2x4t6S4FS8MmKPwOUlMmFqQPnbmmAjqUF1qAPC7_V-AesQQxVNwzg-h/exec';
 
 // === Старая схема: отправка в Google-форму (резерв) ===
 // ВАЖНО: у формы должен быть доступ «Все, у кого есть ссылка».
