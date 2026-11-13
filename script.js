@@ -1,4 +1,6 @@
 // === Приёмник ответов: ваша Google-форма ===
+// ВАЖНО: у формы должен быть доступ «Все, у кого есть ссылка».
+// При «Ограниченном доступе» Google отвечает 401 и ответы гостей молча теряются.
 const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScRgHN66GUX0arAg44J38YPu-zRh1FvLNFb2bRAFccskD24HQ/formResponse';
 
 // Текст вариантов поля "Вы придёте?" (должен совпадать с формой)
