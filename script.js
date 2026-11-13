@@ -1,4 +1,9 @@
-// === Приёмник ответов: ваша Google-форма ===
+// === Приёмник ответов: Google Apps Script → Google-таблица ===
+// Ссылка вида https://script.google.com/macros/s/AKfy.../exec
+// Пока пусто — работает старая отправка в Google-форму (строки ниже).
+const ANSWERS_URL = '';
+
+// === Старая схема: отправка в Google-форму (резерв) ===
 // ВАЖНО: у формы должен быть доступ «Все, у кого есть ссылка».
 // При «Ограниченном доступе» Google отвечает 401 и ответы гостей молча теряются.
 const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScRgHN66GUX0arAg44J38YPu-zRh1FvLNFb2bRAFccskD24HQ/formResponse';
@@ -13,32 +18,29 @@ const ATTENDANCE_LABELS = {
 // ID поля «Напитки» в Google-форме
 const ENTRY_DRINKS = 'entry.1786126185';
 
-// Handle form submission
-document.getElementById('rsvpForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+// --- Отправка в Apps Script (основной путь) ---
+function sendToAnswers(data) {
+    const body = new URLSearchParams();
+    body.append('name', data.name);
+    body.append('phone', data.phone);
+    body.append('guests', data.guests);
+    body.append('attendance', data.attendance);
+    body.append('drinks', data.drinks);
+    body.append('message', data.message);
 
-    const attendance = document.querySelector('input[name="attendance"]:checked').value;
-    const guestsSelect = document.getElementById('guests');
-    const guestsLabel = guestsSelect.options[guestsSelect.selectedIndex].text;
+    fetch(ANSWERS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: body.toString()
+    }).catch(function(err) {
+        // Скрипт недоступен — не теряем ответ, шлём в форму
+        console.error('Apps Script недоступен, отправляю в Google-форму:', err);
+        sendToGoogleForm(data);
+    });
+}
 
-    // Выбор напитков (можно несколько) + свой вариант
-    const checkedDrinks = Array.from(document.querySelectorAll('input[name="drinks"]:checked')).map(el => el.value);
-    const drinkOther = document.getElementById('drinkOther').value.trim();
-    const drinkList = checkedDrinks.filter(v => !(v === 'Свой вариант' && drinkOther));
-    if (drinkOther) drinkList.push('свой вариант: ' + drinkOther);
-    const drinksText = drinkList.join(', ');
-
-    const formData = {
-        name: document.getElementById('name').value.trim(),
-        phone: document.getElementById('phone').value.trim(),
-        guests: guestsLabel,
-        attendance: ATTENDANCE_LABELS[attendance] || attendance,
-        drinks: drinksText,
-        message: document.getElementById('message').value.trim(),
-        timestamp: new Date().toLocaleString('ru-RU')
-    };
-
-    // Отправка в Google-форму: скрытая форма + iframe (POST, без ограничения длины)
+// --- Отправка в Google-форму (резервный путь) ---
+function sendToGoogleForm(formData) {
     try {
         const frameName = 'gform_sink';
 
@@ -76,6 +78,39 @@ document.getElementById('rsvpForm').addEventListener('submit', function(e) {
         setTimeout(() => form.remove(), 5000);
     } catch (err) {
         console.error('Не удалось отправить ответ:', err);
+    }
+}
+
+// Handle form submission
+document.getElementById('rsvpForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const attendance = document.querySelector('input[name="attendance"]:checked').value;
+    const guestsSelect = document.getElementById('guests');
+    const guestsLabel = guestsSelect.options[guestsSelect.selectedIndex].text;
+
+    // Выбор напитков (можно несколько) + свой вариант
+    const checkedDrinks = Array.from(document.querySelectorAll('input[name="drinks"]:checked')).map(el => el.value);
+    const drinkOther = document.getElementById('drinkOther').value.trim();
+    const drinkList = checkedDrinks.filter(v => !(v === 'Свой вариант' && drinkOther));
+    if (drinkOther) drinkList.push('свой вариант: ' + drinkOther);
+    const drinksText = drinkList.join(', ');
+
+    const formData = {
+        name: document.getElementById('name').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        guests: guestsLabel,
+        attendance: ATTENDANCE_LABELS[attendance] || attendance,
+        drinks: drinksText,
+        message: document.getElementById('message').value.trim(),
+        timestamp: new Date().toLocaleString('ru-RU')
+    };
+
+    // Куда отправляем: в Apps Script (если настроен) или в Google-форму
+    if (ANSWERS_URL) {
+        sendToAnswers(formData);
+    } else {
+        sendToGoogleForm(formData);
     }
 
     // Локальная копия на устройстве гостя (бэкап)
