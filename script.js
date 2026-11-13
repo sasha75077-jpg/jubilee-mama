@@ -38,20 +38,42 @@ document.getElementById('rsvpForm').addEventListener('submit', function(e) {
         timestamp: new Date().toLocaleString('ru-RU')
     };
 
-    // Отправка в Google-форму (скрытый iframe — гость ничего лишнего не видит)
+    // Отправка в Google-форму: скрытая форма + iframe (POST, без ограничения длины)
     try {
-        const params = new URLSearchParams();
-        params.append('entry.571643149', formData.name);        // Ваше имя
-        params.append('entry.2019439900', formData.phone);      // Телефон
-        params.append('entry.1807244277', formData.guests);     // Количество гостей
-        params.append('entry.250966081', formData.attendance);  // Вы придёте?
-        params.append(ENTRY_DRINKS, formData.drinks);           // Напитки
-        params.append('entry.471263011', formData.message);     // Пожелания
+        const frameName = 'gform_sink';
 
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = GOOGLE_FORM_URL + '?' + params.toString();
-        document.body.appendChild(iframe);
+        let iframe = document.querySelector('iframe[name="' + frameName + '"]');
+        if (!iframe) {
+            iframe = document.createElement('iframe');
+            iframe.name = frameName;
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+        }
+
+        const form = document.createElement('form');
+        form.action = GOOGLE_FORM_URL;
+        form.method = 'POST';
+        form.target = frameName;
+        form.style.display = 'none';
+
+        const add = (name, value) => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value;
+            form.appendChild(input);
+        };
+
+        add('entry.571643149', formData.name);        // Ваше имя
+        add('entry.2019439900', formData.phone);      // Телефон
+        add('entry.1807244277', formData.guests);     // Количество гостей
+        add('entry.250966081', formData.attendance);  // Вы придёте?
+        add(ENTRY_DRINKS, formData.drinks);           // Напитки
+        add('entry.471263011', formData.message);     // Пожелания
+
+        document.body.appendChild(form);
+        form.submit();
+        setTimeout(() => form.remove(), 5000);
     } catch (err) {
         console.error('Не удалось отправить ответ:', err);
     }
